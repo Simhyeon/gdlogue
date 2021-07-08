@@ -1,0 +1,29 @@
+{
+	"speakers": [
+		{"id": "A",  "name": "A person's name"},
+		{"id": "B",  "name": "B person's name"}
+	],
+	"dialogues": [
+		{
+			"id" : "",
+			"content": [
+				{ "type": "text","speaker" : "a", "text": "yatti yatta"},
+				{ "type": "text","speaker" : "b", "text": "yatti yatta 2"}
+			],
+			"redirect" : "none"
+		},
+		{
+			"id" : "",
+			"content": [
+				{ "type": "text","speaker" : "a", "text": "yatti yatta ho~"},
+				{ "type": "selection","speaker" : "b", "text": "Would you", "selection": [
+					{"text": "1", "redirect": "none"},
+					{"text": "2", "redirect": "none"},
+					{"text": "3", "redirect": "none"},
+					{"text": "4", "redirect": "none"}
+				]}
+			],
+			"redirect" : "none"
+		}
+	]
+}
