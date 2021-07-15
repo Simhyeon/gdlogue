@@ -4,7 +4,7 @@ import babel from '@rollup/plugin-babel';
 import replace from '@rollup/plugin-replace';
 
 export default {
-    input: 'template/tree.js',
+    input: 'template/app.js',
     output: {
         file: 'template/bundle.js',
         format: 'iife',
