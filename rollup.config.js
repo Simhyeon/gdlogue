@@ -4,16 +4,16 @@ import babel from '@rollup/plugin-babel';
 import replace from '@rollup/plugin-replace';
 
 export default {
-    input: 'src/app.js',
+    input: 'template/tree.js',
     output: {
-        file: 'bundle.js',
+        file: 'template/bundle.js',
         format: 'iife',
         name: 'bundle'
     },
 	watch: {
 		skipWrite: false,
 		clearScreen: false,
-		include: 'src/**/*',
+		include: 'template/**/*',
 		//exclude: 'node_modules/**',
 		// chokidar: {
 		//     paths: 'src/**/*',
