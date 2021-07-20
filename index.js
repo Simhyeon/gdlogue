@@ -1,60 +1,10 @@
 import Ajv from "ajv";
 import fs from "fs";
-const schema = {
-	type: "object",
-	properties: {
-		speakers: {
-			type: "array",
-			items: {
-				type: "object",
-				properties: {
-					id: { type: "string" },
-					name: { type: "string" }
-				},
-				required: ["id", "name"]
-			}
-		},
-		dialogues: {
-			type: "array",
-			items: {
-				type: "object",
-				properties: {
-					id: { type: "string" },
-					content: {
-						type: "array",
-						items: {
-							type: "object",
-							properties: {
-								type: { type: "string" },
-								speaker: { type: "string" },
-								text: { type: "string" },
-								selection: {
-									type: "array",
-									optional: "true",
-									itmes: {
-										type: "object",
-										properties: {
-											text: { type: "string" },
-											redirect: { type: "string" }
-										},
-										required: ["text", "redirect"]
-									}
-								}
-							},
-							required: ["type", "speaker", "text"]
-						}
-					}
-				},
-				required: ["id", "content"]
-			}
-		}
-	},
-	required: ["speakers", "dialogues"],
-	additionalProperties: false
-}
 
 class Gdlogue {
 	constructor(json) { 
+		let schema = JSON.parse(fs.readFileSync('schema.json'));
+		console.log(JSON.stringify(schema, null, 4));
 		this.ajv = new Ajv();
 		this.validater = this.ajv.compile(schema)
 		this.json = json;
