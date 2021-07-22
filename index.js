@@ -1,10 +1,9 @@
 import Ajv from "ajv";
 import fs from "fs";
+import { schema } from "./schema.js";
 
 class Gdlogue {
 	constructor(json) { 
-		let schema = JSON.parse(fs.readFileSync('schema.json'));
-		console.log(JSON.stringify(schema, null, 4));
 		this.ajv = new Ajv();
 		this.validater = this.ajv.compile(schema)
 		this.content = json;
@@ -74,8 +73,8 @@ class Gdlogue {
 
 	dotify(){
 		// Start
-		let dotScript = 'digraph {\n';
-		let globalAttributes = 'node[shape="record"]\n';
+		let dotScript = 'digraph Dialogue {\n';
+		let globalAttributes = 'node [shape="record"]\n';
 
 		dotScript += globalAttributes;
 		this.content.forEach((node) => {
@@ -89,14 +88,14 @@ class Gdlogue {
 				attr += `Speaker : ${node.speaker}|`;
 			}
 			attr += `Type : ${node.type}|`
-			dotScript += `${node.id} [label ${attr}]\n`;
+			dotScript += `${node.id} [label="${attr}"]\n`;
 
 			// Set node edges TODO : Check if this is valid syntax
 			let edges = '';
 
 			if (node.type == 'text') {
 				edges += `${node.id} -> ${node.goto}\n`;
-			} else {
+			} else if (node.type == 'selection' || node.type == 'branch') {
 				node.diversion.forEach((div) => {
 					edges += `${node.id} -> ${div.goto}\n`;
 				});

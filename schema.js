@@ -1,11 +1,11 @@
-{
+export const schema = {
 	"type": "array",
 	"items": {
 		"type": "object",
 		"properties": {
-			"id": { "type": "string" },
-			"type": { "type": "string" },
-			"goto": { "type": "string" },
+			"id": { "type": ["string", "null"] },
+			"type": { "type": ["string", "null"] },
+			"goto": { "type": ["string", "null"] },
 			"speaker": {"type": "string"},
 			"text": {"type": "string"},
 			"diversion": {
