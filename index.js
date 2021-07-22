@@ -130,7 +130,7 @@ class Gdlogue {
 					}
 				});
 			}
-			dotScript += `${node.id} [label="{${label.slice(0,-1)}}" ${style}]\n`;
+			dotScript += `${node.id} [id="${node.id}" label="{${label.slice(0,-1)}}" ${style}]\n`;
 			dotScript += edges;
 		});
 
