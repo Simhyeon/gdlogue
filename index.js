@@ -2,11 +2,22 @@ import Ajv from "ajv";
 import fs from "fs";
 import { schema } from "./schema.js";
 
+function nullEmpty(str) {
+	if (str == null || str.toLowerCase() == 'null' || str == ''){
+		return true;
+	} else {
+		return false;
+	}
+}
+
 class Gdlogue {
 	constructor(json) { 
 		this.ajv = new Ajv();
 		this.validater = this.ajv.compile(schema)
 		this.content = json;
+
+		this.error_list = [];
+		this.warning_list = [];
 	}
 
 	format_validate() {
@@ -19,31 +30,29 @@ class Gdlogue {
 	}
 
 	content_validate() {
-		this.error_list = [];
-		this.warning_list = [];
 		this.content.forEach((node) => {
 			switch (node.type) {
 				case 'text':
 					if (node.text = '') {
-						this.warning_list.push('<Warning> : ' + node.id + '\'s text is empty.');
+						this.warning_list.push('<Warning> : ' + node.id + '\'s text is empty.\n');
 					}
 					if (node.speaker = '') {
-						this.warning_list.push('<Warning> : ' + node.id + '\'s speaker is empty.');
+						this.warning_list.push('<Warning> : ' + node.id + '\'s speaker is empty.\n');
 					}
 					break;
 				case 'selection':
 					if (node.diversion.length == 0 ) {
-						this.error_list.push('<Error> : ' + node.id + '\'s diversion array is empty. This node\' type is selection thus this is not allowed.');
+						this.error_list.push('<Error> : ' + node.id + '\'s diversion array is empty. This node\' type is selection thus this is not allowed.\n');
 					}
 					node.diversion.forEach((div) => {
 						if (div.text = '') {
-							this.warning_list.push('<Warning> : ' + node.id + '\'s diversion, ' + div.id + '\' has empty text although node type is selection.');
+							this.warning_list.push('<Warning> : ' + node.id + '\'s diversion, ' + div.id + '\' has empty text although node type is selection.\n');
 						}
 					});
 					break;
 				case 'branch':
 					if (node.diversion.length == 0 ) {
-						this.error_list.push('<Error> : ' + node.id + '\'s diversion array is empty. This node\' type is branch thus this is not allowed.');
+						this.error_list.push('<Error> : ' + node.id + '\'s diversion array is empty. This node\' type is branch thus this is not allowed.\n');
 					}
 					let empty_qual_count = 0;
 					node.diversion.forEach((div) => {
@@ -51,13 +60,20 @@ class Gdlogue {
 						// To only print once.
 						// There is no break statement in js foreach
 						if (empty_qual_count == 1){
-							this.warning_list.push('<Warning> : ' + node.id + '\'s diversion include multiple empty qualifications although node type is branch. Multiple empty(default) node might not work as intended.');
+							this.warning_list.push('<Warning> : ' + node.id + '\'s diversion include multiple empty qualifications although node type is branch. Multiple empty(default) node might not work as intended.\n');
 							return;
 						}
 					});
 					break;
 				
+				// Null is fine
+				case null:
+					break;
+				case 'null':
+					break;
+
 				default:
+					this.error_list.push(`<Error> : ${node.id}'s type ${node.type} is not valid\n`);
 					break;
 			}
 		});
@@ -78,34 +94,49 @@ class Gdlogue {
 
 		dotScript += globalAttributes;
 		this.content.forEach((node) => {
-			// Continue if goto is null (Null goto means invalid or placeholder)
-			if (node.goto == null || node.goto.toLowerCase() == "null") {
+			// Continue if type is null (Null type means invalid or placeholder)
+			if (nullEmpty(node.type)) {
 				return
 			}
+
 			// Set node attributes
-			let attr = '';
-			if (node.type == 'text' || node.type == 'selection') {
-				attr += `Speaker : ${node.speaker}|`;
+			let label = `Type : ${node.type}|`;
+			let style ='';
+			switch (node.type) {
+				case 'text':
+					label += `Speaker : ${node.speaker}|`;
+					break;
+				case 'selection':
+					label += `Speaker : ${node.speaker}|`;
+					style += `colorfill="white" color="green3"`;
+					break;
+				case 'branch':
+					style += `colorfill="white" color="dodgerblue3"`;
+					break;
+				default:
+					break;
+					
 			}
-			attr += `Type : ${node.type}|`
-			dotScript += `${node.id} [label="${attr}"]\n`;
 
 			// Set node edges TODO : Check if this is valid syntax
 			let edges = '';
 
-			if (node.type == 'text') {
+			if (node.type == 'text' && !nullEmpty(node.goto)) {
 				edges += `${node.id} -> ${node.goto}\n`;
 			} else if (node.type == 'selection' || node.type == 'branch') {
 				node.diversion.forEach((div) => {
-					edges += `${node.id} -> ${div.goto}\n`;
+					if (!nullEmpty(div.goto)){
+						edges += `${node.id} -> ${div.goto}\n`;
+					}
 				});
 			}
+			dotScript += `${node.id} [label="{${label.slice(0,-1)}}" ${style}]\n`;
 			dotScript += edges;
 		});
 
 		// End
 		dotScript += '}';
-		console.log(dotScript);
+		fs.writeFileSync('out.gv', dotScript);
 	}
 }
 
@@ -123,7 +154,15 @@ function main() {
 		console.log("Failed to validate json file.");
 		return;
 	}
-	
+
+	gdlogue.content_validate();
+
+	console.log(...gdlogue.warning_list);
+	console.log(...gdlogue.error_list);
+
+	if (gdlogue.error_list.length != 0 ) {
+		process.exit(0);
+	}
 
 	switch (sub_command) {
 		case 'print':
