@@ -19,7 +19,6 @@
     "eslint": "^7.30.0"
   },
   "dependencies": {
-    "ajv": "^6.12.6",
-    "d3-graphviz": "^4.0.0"
+    "ajv": "^6.12.6"
   }
 }
