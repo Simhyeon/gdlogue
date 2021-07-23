@@ -33,10 +33,10 @@ class Gdlogue {
 		this.content.forEach((node) => {
 			switch (node.type) {
 				case 'text':
-					if (node.text = '') {
+					if (node.text === '') {
 						this.warning_list.push('<Warning> : ' + node.id + '\'s text is empty.\n');
 					}
-					if (node.speaker = '') {
+					if (node.speaker === '') {
 						this.warning_list.push('<Warning> : ' + node.id + '\'s speaker is empty.\n');
 					}
 					break;
@@ -45,7 +45,7 @@ class Gdlogue {
 						this.error_list.push('<Error> : ' + node.id + '\'s diversion array is empty. This node\' type is selection thus this is not allowed.\n');
 					}
 					node.diversion.forEach((div) => {
-						if (div.text = '') {
+						if (div.text === '') {
 							this.warning_list.push('<Warning> : ' + node.id + '\'s diversion, ' + div.id + '\' has empty text although node type is selection.\n');
 						}
 					});
@@ -56,7 +56,7 @@ class Gdlogue {
 					}
 					let empty_qual_count = 0;
 					node.diversion.forEach((div) => {
-						if (div.qual = '') { empty_qual_count++; }
+						if (div.qual === '') { empty_qual_count++; }
 						// To only print once.
 						// There is no break statement in js foreach
 						if (empty_qual_count == 1){
@@ -157,8 +157,8 @@ function main() {
 
 	gdlogue.content_validate();
 
-	console.log(...gdlogue.warning_list);
-	console.log(...gdlogue.error_list);
+	if (gdlogue.warning_list.length != 0) { console.log(...gdlogue.warning_list);}
+	if (gdlogue.error_list.length != 0 ) {console.log(...gdlogue.error_list);}
 
 	if (gdlogue.error_list.length != 0 ) {
 		process.exit(0);
